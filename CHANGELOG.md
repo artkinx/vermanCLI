@@ -1,6 +1,10 @@
 
 # Changelog
 
+## 1.1.0+2
+
+- **fix**: `platform support` now correctly shows support for only Android and iOS with more platforms to come.
+
 ## 1.1.0+1
 
 - **fix**: `check-platforms` now correctly handles projects using Flutter variables for versioning.
