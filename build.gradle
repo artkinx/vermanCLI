@@ -1,0 +1,18 @@
+// This is a simplified placeholder file for demonstration purposes.
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+android {
+    defaultConfig {
+        applicationId "com.example.example_app"
+        minSdkVersion 21
+        versionCode 1
+        versionName "1.0.0"
+    }
+}

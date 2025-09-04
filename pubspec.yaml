@@ -1,0 +1,24 @@
+name: verman
+description: A friendly neighborhood version manager for Flutter projects. Automates versioning across pubspec.yaml, build.gradle, and Info.plist.
+version: 1.1.0
+homepage: https://github.com/artkinx/verman
+repository: https://github.com/artkinx/verman
+topics:
+  - version
+  - automation
+  - flutter
+  - cli
+
+executables:
+  verman:
+
+environment:
+  sdk: ^3.9.0
+
+# Add regular dependencies here.
+dependencies:
+  path: ^1.9.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
