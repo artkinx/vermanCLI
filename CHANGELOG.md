@@ -1,3 +1,10 @@
+
+# Changelog
+
+## 1.1.0+1
+
+- **fix**: `check-platforms` now correctly handles projects using Flutter variables for versioning.
+
 ## 1.1.0
 
 - **feat**: Add `sync` command to update platform files from `pubspec.yaml`.
