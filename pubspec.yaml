@@ -8,6 +8,9 @@ topics:
   - automation
   - flutter
   - cli
+platforms:
+    ios: 
+    android: 
 
 executables:
   verman:
