@@ -168,6 +168,32 @@ flutter {
       );
     });
 
+    group('init', () {
+      test('`init` command creates a verman.yaml file', () async {
+        final configFile = File(p.join(tempDir.path, 'verman.yaml'));
+        expect(configFile.existsSync(), isFalse);
+
+        final output = <String>[];
+        runZoned(
+          () => verman.main(['init']),
+          zoneSpecification: ZoneSpecification(
+            print: (self, parent, zone, line) {
+              output.add(line);
+            },
+          ),
+        );
+
+        expect(
+          output,
+          contains('✅ Created verman.yaml with default configuration.'),
+        );
+        expect(configFile.existsSync(), isTrue);
+        final content = configFile.readAsStringSync();
+        expect(content, contains('# Verman configuration file.'));
+        expect(content, contains('# paths:'));
+      });
+    });
+
     // This group tests the CLI by running it as a separate process.
     // This is the most accurate way to test the public interface,
     // including exit codes and stderr.
@@ -207,17 +233,19 @@ flutter {
     void _createMockPlatformFiles({
       required String buildGradleContent,
       required String infoPlistContent,
+      String androidPath = 'android/app/build.gradle',
+      String iosPath = 'ios/Runner/Info.plist',
     }) {
-      final androidDir = Directory(p.join(tempDir.path, 'android', 'app'))
+      final androidDir = Directory(p.dirname(p.join(tempDir.path, androidPath)))
         ..createSync(recursive: true);
       File(
-        p.join(androidDir.path, 'build.gradle'),
+        p.join(tempDir.path, androidPath),
       ).writeAsStringSync(buildGradleContent);
 
-      final iosDir = Directory(p.join(tempDir.path, 'ios', 'Runner'))
+      final iosDir = Directory(p.dirname(p.join(tempDir.path, iosPath)))
         ..createSync(recursive: true);
       File(
-        p.join(iosDir.path, 'Info.plist'),
+        p.join(tempDir.path, iosPath),
       ).writeAsStringSync(infoPlistContent);
     }
 
@@ -255,6 +283,41 @@ flutter {
         expect(result.exitCode, 0);
         expect(result.stdout, contains('✅ In Sync (using Flutter variables)'));
         expect(result.stderr, isEmpty);
+      });
+
+      test('respects custom paths from verman.yaml', () async {
+        // Create a config file with custom paths
+        File(p.join(tempDir.path, 'verman.yaml')).writeAsStringSync('''
+paths:
+  android: custom/android/build.gradle
+  ios: custom/ios/Info.plist
+''');
+
+        // Create platform files at the custom paths
+        _createMockPlatformFiles(
+          buildGradleContent: initialBuildGradleContent, // 1.0+1 -> out of sync
+          infoPlistContent:
+              variableInfoPlistContent, // uses variables -> in sync
+          androidPath: 'custom/android/build.gradle',
+          iosPath: 'custom/ios/Info.plist',
+        );
+
+        final result = await Process.run(Platform.executable, [
+          scriptPath,
+          'check-platforms',
+        ], workingDirectory: tempDir.path);
+
+        expect(result.exitCode, 0);
+        expect(
+          result.stdout,
+          contains(
+            'Android (custom/android/build.gradle) version: 1.0 (1) - ❌ Out of Sync',
+          ),
+        );
+        expect(
+          result.stdout,
+          contains('iOS (custom/ios/Info.plist) - ✅ In Sync'),
+        );
       });
     });
 
@@ -318,6 +381,41 @@ flutter {
           ).readAsStringSync(),
           variableInfoPlistContent,
         );
+      });
+
+      test('syncs files at custom paths from verman.yaml', () async {
+        // pubspec is 1.2.3+4
+        File(p.join(tempDir.path, 'verman.yaml')).writeAsStringSync('''
+paths:
+  android: my_app/gradle.build
+  ios: my_ios_app/MyInfo.plist
+''');
+
+        _createMockPlatformFiles(
+          buildGradleContent: initialBuildGradleContent, // 1.0+1
+          infoPlistContent: initialInfoPlistContent, // 1.0+1
+          androidPath: 'my_app/gradle.build',
+          iosPath: 'my_ios_app/MyInfo.plist',
+        );
+
+        await Process.run(Platform.executable, [
+          scriptPath,
+          'sync',
+        ], workingDirectory: tempDir.path);
+
+        // Check Android file at custom path
+        final newGradleContent = File(
+          p.join(tempDir.path, 'my_app/gradle.build'),
+        ).readAsStringSync();
+        expect(newGradleContent, contains('versionCode 4'));
+        expect(newGradleContent, contains('versionName "1.2.3"'));
+
+        // Check iOS file at custom path
+        final newPlistContent = File(
+          p.join(tempDir.path, 'my_ios_app/MyInfo.plist'),
+        ).readAsStringSync();
+        expect(newPlistContent, contains('<string>4</string>'));
+        expect(newPlistContent, contains('<string>1.2.3</string>'));
       });
     });
   });

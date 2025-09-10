@@ -1,6 +1,16 @@
 
 # Changelog
 
+## 🛠️ Upcoming - v1.2.0
+- 🪄 Changelog automation feature (auto-generates release from commit history)
+_____
+
+## 1.1.1+3
+
+- **docs**: Updates `Changelog.md` with upcoming changes
+- **feat**: Introduce `init` command to create default verman.yaml configuration
+- **fix**: Update platform version checking and syncing to respect custom paths
+
 ## 1.1.0+2
 
 - **fix**: `platform support` now correctly shows support for only Android and iOS with more platforms to come.

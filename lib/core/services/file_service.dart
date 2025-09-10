@@ -27,6 +27,26 @@ class FileService {
     }
   }
 
+  /// Reads and returns the content of the pubspec.yaml file.
+  /// @returns {PubspecContentModel?} The file content, or null if not found.
+  static Future<PubspecContentModel?> getPubspecContentAsync() async {
+    final pubspecFilePath = p.join(Directory.current.path, 'pubspec.yaml');
+    final pubspecFile = File(pubspecFilePath);
+
+    if (!pubspecFile.existsSync()) {
+      stderr.writeln('Error: pubspec.yaml not found in the current directory.');
+      return null;
+    }
+
+    try {
+      var fileContent = await pubspecFile.readAsString();
+      return PubspecContentModel(path: pubspecFilePath, content: fileContent);
+    } on FileSystemException catch (e) {
+      stderr.writeln('Error reading pubspec.yaml: ${e.message}');
+      return null;
+    }
+  }
+
   ///Write a new content to the pubspec.yaml file
   ///
   static void writePubspecContent(
