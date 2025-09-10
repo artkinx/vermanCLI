@@ -9,6 +9,7 @@ _____
 ## 1.1.3+5
 
 - **fix**: Fixed bug that caused increment to behave wrongly
+- **fix**: Cleaned up the commands to be more consistent and easier to use and efficient
 
 ## 1.1.2+4
 
