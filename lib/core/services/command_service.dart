@@ -58,6 +58,7 @@ class CommandService {
 
   static const String helpHelp = '''
 Available commands for Flutter projects:
+  init                  - Initialize verman in the current project (optional).
   current               - Displays the current version from pubspec.yaml.
   increment [part]      - Increments the version by major, minor, or patch.
                           Example: increment patch
