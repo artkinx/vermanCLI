@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../models/pubspec_content_model.dart';
 
@@ -307,5 +308,10 @@ class FileService {
     } on FileSystemException {
       return false; // Error reading/writing file
     }
+  }
+
+  /// Gets the version of the package.
+  static Future<PackageInfo> getPackageInfo() async {
+    return await PackageInfo.fromPlatform();
   }
 }

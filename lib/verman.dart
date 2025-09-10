@@ -7,6 +7,7 @@ import 'package:verman/core/commands/current_command.dart';
 
 import 'core/commands/init_command.dart';
 import 'core/commands/increment_command.dart';
+import 'core/commands/package_version_command.dart';
 import 'core/commands/sync_command.dart';
 import 'core/services/command_service.dart';
 
@@ -39,6 +40,10 @@ Future<void> main(List<String> arguments) async {
       print(CommandService.syncHelp);
     }
 
+    if (arguments.first == 'init') {
+      print(CommandService.initHelp);
+    }
+
     return;
   }
 
@@ -64,6 +69,10 @@ Future<void> main(List<String> arguments) async {
     
     case 'check-platforms':
       await CheckPlatformCommand(args).run();
+      break;
+
+    case 'version':
+      PackageVersionCommand(args).run();
       break;
       
     case 'sync':
