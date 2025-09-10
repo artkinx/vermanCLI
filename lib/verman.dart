@@ -10,8 +10,6 @@ import 'core/commands/increment_command.dart';
 import 'core/commands/sync_command.dart';
 import 'core/services/command_service.dart';
 
-
-
 /// The main entry point for the CLI tool.
 /// @param {List&lt;String&gt;} arguments The command line arguments.
 Future<void> main(List<String> arguments) async {
