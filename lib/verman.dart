@@ -1,19 +1,48 @@
 import 'dart:io';
+// ignore: unused_import
+import 'package:path/path.dart' as p;
 
-
-import 'package:verman/core/commands/build_command.dart';
-import 'package:verman/core/commands/check_platform_command.dart';
-import 'package:verman/core/commands/current_command.dart';
-
-import 'core/commands/init_command.dart';
-import 'core/commands/increment_command.dart';
-import 'core/commands/package_version_command.dart';
-import 'core/commands/sync_command.dart';
 import 'core/services/command_service.dart';
+import 'core/services/file_service.dart';
+
+// Regular expression to find and capture the version string (e.g., 1.0.0+1)
+final RegExp versionPattern = RegExp(r'version:\s*(\d+\.\d+\.\d+)(?:\+(\d+))?');
+
+/// Gets the version name and build number from the pubspec content.
+/// @param {String} content The pubspec file content.
+/// @returns {{versionName: String, buildNumber: String?}} The version data, or null if not found.
+Map<String, String?>? getVersion(String content) {
+  final match = versionPattern.firstMatch(content);
+  if (match != null) {
+    return {'versionName': match.group(1), 'buildNumber': match.group(2)};
+  }
+  return null;
+}
+
+/// Updates the version in the pubspec.yaml file.
+/// @param {String} newVersionName The new version name (e.g., "1.0.1").
+/// @param {String?} newBuildNumber The new build number, or null to keep existing.
+void updateVersion(String newVersionName, String? newBuildNumber) {
+  var pubspecContent = FileService.getPubspecContent();
+  if (pubspecContent == null) return;
+
+  final newVersionString =
+      'version: $newVersionName${newBuildNumber != null ? '+$newBuildNumber' : ''}';
+  final updatedContent = pubspecContent.content.replaceFirst(
+    versionPattern,
+    newVersionString,
+  );
+
+  FileService.writePubspecContent(
+    updatedContent,
+    newVersionName,
+    newBuildNumber,
+  );
+}
 
 /// The main entry point for the CLI tool.
 /// @param {List&lt;String&gt;} arguments The command line arguments.
-Future<void> main(List<String> arguments) async {
+void main(List<String> arguments) {
   if (arguments.isEmpty || arguments.first == 'help') {
     print(CommandService.helpHelp);
     return;
@@ -40,10 +69,6 @@ Future<void> main(List<String> arguments) async {
       print(CommandService.syncHelp);
     }
 
-    if (arguments.first == 'init') {
-      print(CommandService.initHelp);
-    }
-
     return;
   }
 
@@ -52,36 +77,285 @@ Future<void> main(List<String> arguments) async {
 
   switch (command) {
     case 'current':
-      await CurrentCommand(args).run();
+      final content = FileService.getPubspecContent();
+      if (content != null) {
+        final versionData = getVersion(content.content);
+        if (versionData != null) {
+          if (versionData['buildNumber'] != null) {
+            print(
+              'Current version: ${versionData['versionName']}+${versionData['buildNumber']}',
+            );
+          } else {
+            print('Current version: ${versionData['versionName']}');
+          }
+        } else {
+          stderr.writeln('Error: Could not find version in pubspec.yaml.');
+        }
+      }
       break;
 
     case 'increment':
-      await IncrementCommand(args).run();
+      if (args.isEmpty) {
+        stderr.writeln(
+          'Error: Missing part to increment. Use "major", "minor", or "patch".',
+        );
+        exit(1);
+      }
+      final partToIncrement = args[0];
+      final parts = ['major', 'minor', 'patch'];
+      if (!parts.contains(partToIncrement)) {
+        stderr.writeln(
+          'Error: Invalid part "$partToIncrement". Use "major", "minor", or "patch".',
+        );
+        exit(1);
+      }
+
+      final content = FileService.getPubspecContent();
+      if (content == null) {
+        exit(1);
+      }
+
+      final currentVersion = getVersion(content.content);
+      if (currentVersion == null) {
+        stderr.writeln('Error: Could not find a valid version to increment.');
+        return;
+      }
+
+      var newVersionParts = currentVersion['versionName']!
+          .split('.')
+          .map(int.parse)
+          .toList();
+      if (partToIncrement == 'major') {
+        newVersionParts[0]++;
+        newVersionParts[1] = 0;
+        newVersionParts[2] = 0;
+      } else if (partToIncrement == 'minor') {
+        newVersionParts[1]++;
+        newVersionParts[2] = 0;
+      } else if (partToIncrement == 'patch') {
+        newVersionParts[2]++;
+      }
+
+      final newVersionName = newVersionParts.join('.');
+      final newBuildNumber =
+          (int.tryParse(currentVersion['buildNumber'] ?? '0') ?? 0) + 1;
+
+      updateVersion(newVersionName, newBuildNumber.toString());
       break;
 
     case 'init':
-      await InitCommand(args).run();
-      break;
+      final configFile = File(p.join(Directory.current.path, 'verman.yaml'));
+      if (!configFile.existsSync()) {
+        // Default configuration
+        const defaultConfig = '''
+# Verman configuration file.
+# For more information, see the Verman documentation on GitHub.
+#
+# Use this file to override default behaviors.
 
+# You can specify custom paths to your platform-specific version files.
+# If a path is not provided, Verman will search for default files
+# (e.g., `android/app/build.gradle` or `android/app/build.gradle.kts`).
+#
+# paths:
+#   android: path/to/your/build.gradle
+#   ios: path/to/your/Info.plist
+''';
+        configFile.writeAsStringSync(defaultConfig);
+        print('✅ Created verman.yaml with default configuration.');
+      } else {
+        print('verman.yaml already exists.');
+      }
+      break;
     case 'build':
-      await BuildCommand(args).run();
-      break;
-    
-    case 'check-platforms':
-      await CheckPlatformCommand(args).run();
+      final content = FileService.getPubspecContent();
+      if (content == null) {
+        exit(1);
+      }
+
+      final currentBuild = getVersion(content.content);
+      if (currentBuild == null) {
+        stderr.writeln('Error: Could not find a valid version to increment.');
+        return;
+      }
+
+      final newBuildNumber =
+          (int.tryParse(currentBuild['buildNumber'] ?? '0') ?? 0) + 1;
+
+      print('Running \'flutter pub run build_runner build\'...');
+      updateVersion(currentBuild['versionName']!, newBuildNumber.toString());
+      print(
+        'Successfully generated files and updated build number to $newBuildNumber.',
+      );
       break;
 
-    case 'version':
-      await PackageVersionCommand(args).run();
+    case 'check-platforms':
+      final pubspecContent = FileService.getPubspecContent();
+      if (pubspecContent == null) {
+        exit(1);
+      }
+
+      final pubspecVersion = getVersion(pubspecContent.content);
+      if (pubspecVersion == null) {
+        stderr.writeln(
+          'Error: Could not find version in pubspec.yaml to check.',
+        );
+        return;
+      }
+
+      print(
+        'Checking platform files against pubspec version: ${pubspecVersion['versionName']}+${pubspecVersion['buildNumber']}...',
+      );
+      var allInSync = true;
+
+      // Check Android
+      final androidVersion = FileService.getAndroidVersion();
+      if (androidVersion == null) {
+        print(
+          'Android (android/app/build.gradle) - ⚠️ Not found or could not read.',
+        );
+        allInSync = false;
+      } else if (androidVersion.isEmpty) {
+        print(
+          'Android (android/app/build.gradle) - ⚠️ Could not parse version.',
+        );
+        allInSync = false;
+      } else {
+        final isVariable =
+            androidVersion['versionName'] == 'flutter.versionName';
+        if (isVariable) {
+          print(
+            'Android (android/app/build.gradle) - ✅ In Sync (using Flutter variables)',
+          );
+        } else {
+          final isNameMatch =
+              androidVersion['versionName'] == pubspecVersion['versionName'];
+          final isCodeMatch =
+              androidVersion['buildNumber'] == pubspecVersion['buildNumber'];
+          final status = isNameMatch && isCodeMatch
+              ? '✅ In Sync'
+              : '❌ Out of Sync';
+          print(
+            'Android (android/app/build.gradle) version: ${androidVersion['versionName']} (${androidVersion['buildNumber']}) - $status',
+          );
+          if (!isNameMatch || !isCodeMatch) allInSync = false;
+        }
+      }
+
+      // Check iOS
+      final iosVersion = FileService.getIosVersion();
+      if (iosVersion == null) {
+        print('iOS (ios/Runner/Info.plist) - ⚠️ Not found or could not read.');
+        allInSync = false;
+      } else if (iosVersion.isEmpty) {
+        print('iOS (ios/Runner/Info.plist) - ⚠️ Could not parse version.');
+        allInSync = false;
+      } else {
+        final isVariable =
+            iosVersion['versionName'] == r'$(FLUTTER_BUILD_NAME)';
+        if (isVariable) {
+          print(
+            'iOS (ios/Runner/Info.plist) - ✅ In Sync (using Flutter variables)',
+          );
+        } else {
+          final isNameMatch =
+              iosVersion['versionName'] == pubspecVersion['versionName'];
+          final isCodeMatch =
+              iosVersion['buildNumber'] == pubspecVersion['buildNumber'];
+          final status = isNameMatch && isCodeMatch
+              ? '✅ In Sync'
+              : '❌ Out of Sync';
+          print(
+            'iOS (ios/Runner/Info.plist) version: ${iosVersion['versionName']} (${iosVersion['buildNumber']}) - $status',
+          );
+          if (!isNameMatch || !isCodeMatch) allInSync = false;
+        }
+      }
+
+      print(''); // Newline for spacing
+      if (allInSync) {
+        print('All platform versions are in sync with pubspec.yaml.');
+      } else {
+        stderr.writeln(
+          '''Warning: One or more platform versions are out of sync.
+          
+          run 'dart run verman sync' to sync.
+          ''',
+        );
+      }
       break;
-      
+
     case 'sync':
-      await SyncCommand(args).run();
+      final pubspecContent = FileService.getPubspecContent();
+      if (pubspecContent == null) {
+        exit(1);
+      }
+
+      final pubspecVersion = getVersion(pubspecContent.content);
+      if (pubspecVersion == null || pubspecVersion['buildNumber'] == null) {
+        stderr.writeln(
+          'Error: pubspec.yaml must contain a version and build number (e.g., 1.2.3+1) to sync.',
+        );
+        exit(1);
+      }
+
+      final versionName = pubspecVersion['versionName']!;
+      final buildNumber = pubspecVersion['buildNumber']!;
+
+      print('Syncing version $versionName+$buildNumber to platforms...');
+
+      // Check and sync Android
+      final androidVersion = FileService.getAndroidVersion();
+      if (androidVersion != null &&
+          androidVersion['versionName'] == 'flutter.versionName') {
+        print(
+          'Android (android/app/build.gradle) - ✅ Already configured to use Flutter variables.',
+        );
+      } else {
+        final androidUpdated = FileService.updateAndroidVersion(
+          versionName,
+          buildNumber,
+        );
+
+        print(
+          'Android (android/app/build.gradle) - ${androidUpdated ? '✅ Synced.' : '⚠️ Not found or no changes made.'}',
+        );
+      }
+
+      // Check and sync iOS
+      final iosVersion = FileService.getIosVersion();
+      if (iosVersion != null &&
+          iosVersion['versionName'] == r'$(FLUTTER_BUILD_NAME)') {
+        print(
+          'iOS (ios/Runner/Info.plist) - ✅ Already configured to use Flutter variables.',
+        );
+      } else {
+        final iosUpdated = FileService.updateIosVersion(
+          versionName,
+          buildNumber,
+        );
+
+        if (!iosUpdated) {
+          var isIosInitialized = FileService.initializeIosVersion();
+
+          if (isIosInitialized) {
+            print('iOS (ios/Runner/Info.plist) - ✅ Initialized.');
+          } else {
+            print('iOS (ios/Runner/Info.plist) - ⚠️ Could not initialize.');
+          }
+        } else {
+          print(
+            'iOS (ios/Runner/Info.plist) - ${iosUpdated ? '✅ Synced.' : '⚠️ Not found or no changes made.'}',
+          );
+        }
+      }
+
+      print('\nSync complete.');
       break;
 
     default:
       stderr.writeln(
-        '\'$command\' is not a recognized command. Try running "verman help or verman" for a list of commands.',
+        '\'$command\' is not a recognized command. Type "verman help" for a list of commands.',
       );
       exit(1);
   }

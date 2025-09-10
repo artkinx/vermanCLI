@@ -25,19 +25,35 @@ class IncrementCommand extends BaseCommand {
     }
 
     final content = await BaseCommand.getPubspecContent;
-    if (content != null) {
-      final versionData = CommandService.getVersion(content.content);
-      if (versionData != null) {
-        if (versionData['buildNumber'] != null) {
-          print(
-            'Current version: ${versionData['versionName']}+${versionData['buildNumber']}',
-          );
-        } else {
-          print('Current version: ${versionData['versionName']}');
-        }
-      } else {
-        stderr.writeln('Error: Could not find version in pubspec.yaml.');
-      }
+    if (content == null) {
+      exit(1);
     }
+
+    final currentVersion = CommandService.getVersion(content.content);
+    if (currentVersion == null) {
+      stderr.writeln('Error: Could not find a valid version to increment.');
+      return;
+      }
+
+    var newVersionParts = currentVersion['versionName']!
+        .split('.')
+        .map(int.parse)
+        .toList();
+    if (partToIncrement == 'major') {
+      newVersionParts[0]++;
+      newVersionParts[1] = 0;
+      newVersionParts[2] = 0;
+    } else if (partToIncrement == 'minor') {
+      newVersionParts[1]++;
+      newVersionParts[2] = 0;
+    } else if (partToIncrement == 'patch') {
+      newVersionParts[2]++;
+    }
+
+    final newVersionName = newVersionParts.join('.');
+    final newBuildNumber =
+        (int.tryParse(currentVersion['buildNumber'] ?? '0') ?? 0) + 1;
+
+    CommandService.updateVersion(newVersionName, newBuildNumber.toString());
   }
 }

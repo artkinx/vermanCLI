@@ -257,9 +257,7 @@ flutter {
 
       final iosDir = Directory(p.dirname(p.join(tempDir.path, iosPath)))
         ..createSync(recursive: true);
-      File(
-        p.join(tempDir.path, iosPath),
-      ).writeAsStringSync(infoPlistContent);
+      File(p.join(tempDir.path, iosPath)).writeAsStringSync(infoPlistContent);
     }
 
     group('check-platforms', () {

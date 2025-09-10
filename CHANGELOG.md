@@ -3,7 +3,12 @@
 
 ## 🛠️ Upcoming - v1.2.0
 - 🪄 Changelog automation feature (auto-generates release from commit history)
+- 🔧 Configuration file for customizing automation behavior
 _____
+
+## 1.1.3+5
+
+- **fix**: Fixed bug that caused increment to behave wrongly
 
 ## 1.1.2+4
 
@@ -12,7 +17,7 @@ _____
 ## 1.1.1+3
 
 - **docs**: Updates `Changelog.md` with upcoming changes
-- **feat**: Introduce `init` command to create default verman.yaml configuration
+- **propose**: Introduce `init` command to create default verman.yaml configuration file
 - **fix**: Update platform version checking and syncing to respect custom paths
 - **fix**: Streamlined Commands Service for better performance and maintainability
 

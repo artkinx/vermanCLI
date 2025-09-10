@@ -1,4 +1,3 @@
-
 import 'file_service.dart';
 
 class CommandService {
@@ -93,5 +92,21 @@ Available commands for Flutter projects:
       return {'versionName': match.group(1), 'buildNumber': match.group(2)};
     }
     return null;
+  }
+
+  static Map<String, String?>? getAndroidVersion() {
+    return FileService.getAndroidVersion();
+  }
+
+  static Map<String, String?>? getIosVersion() {
+    return FileService.getIosVersion();
+  }
+
+  static bool updateAndroidVersion(String versionName, String buildNumber) {
+    return FileService.updateAndroidVersion(versionName, buildNumber);
+  }
+
+  static bool updateIosVersion(String versionName, String buildNumber) {
+    return FileService.updateIosVersion(versionName, buildNumber);
   }
 }

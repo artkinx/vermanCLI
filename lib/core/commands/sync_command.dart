@@ -27,16 +27,27 @@ class SyncCommand extends BaseCommand {
     final buildNumber = pubspecVersion['buildNumber']!;
 
     print('Syncing version $versionName+$buildNumber to platforms...');
+    
+    // Sync Android and iOS
+    _syncAndroid(versionName: versionName, buildNumber: buildNumber);
+    _syncIos(versionName: versionName, buildNumber: buildNumber);
 
+    print('\nSync complete.');
+  }
+
+  void _syncAndroid({
+    required String versionName,
+    required String buildNumber,
+  }) {
     // Check and sync Android
-    final androidVersion = FileService.getAndroidVersion();
+    final androidVersion = CommandService.getAndroidVersion();
     if (androidVersion != null &&
         androidVersion['versionName'] == 'flutter.versionName') {
       print(
         'Android (android/app/build.gradle) - ✅ Already configured to use Flutter variables.',
       );
     } else {
-      final androidUpdated = FileService.updateAndroidVersion(
+      final androidUpdated = CommandService.updateAndroidVersion(
         versionName,
         buildNumber,
       );
@@ -45,9 +56,11 @@ class SyncCommand extends BaseCommand {
         'Android (android/app/build.gradle) - ${androidUpdated ? '✅ Synced.' : '⚠️ Not found or no changes made.'}',
       );
     }
+  }
 
+  void _syncIos({required String versionName, required String buildNumber}) {
     // Check and sync iOS
-    final iosVersion = FileService.getIosVersion();
+    final iosVersion = CommandService.getIosVersion();
     if (iosVersion != null &&
         iosVersion['versionName'] == r'$(FLUTTER_BUILD_NAME)') {
       print(
@@ -70,7 +83,5 @@ class SyncCommand extends BaseCommand {
         );
       }
     }
-
-    print('\nSync complete.');
   }
 }
