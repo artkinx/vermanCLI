@@ -10,6 +10,7 @@ _____
 - **docs**: Updates `Changelog.md` with upcoming changes
 - **feat**: Introduce `init` command to create default verman.yaml configuration
 - **fix**: Update platform version checking and syncing to respect custom paths
+- **fix**: Streamlined Commands Service for better performance and maintainability
 
 ## 1.1.0+2
 
