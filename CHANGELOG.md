@@ -5,6 +5,10 @@
 - 🪄 Changelog automation feature (auto-generates release from commit history)
 _____
 
+## 1.1.2+4
+
+- **fix**: General bug fixes
+
 ## 1.1.1+3
 
 - **docs**: Updates `Changelog.md` with upcoming changes

@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
-import 'package:package_info_plus/package_info_plus.dart';
 
+import 'package:yaml/yaml.dart';
 import '../../models/pubspec_content_model.dart';
 
 class FileService {
@@ -310,8 +310,47 @@ class FileService {
     }
   }
 
-  /// Gets the version of the package.
-  static Future<PackageInfo> getPackageInfo() async {
-    return await PackageInfo.fromPlatform();
+  /// Gets the version of the verman package itself by finding and reading its own pubspec.yaml.
+  /// This is useful for the `verman version` command.
+  /// @returns {Map&lt;String, String?&gt;?} A map with 'versionName' and 'buildNumber', or null if not found.
+  static Future<Map<String, String?>?> getSelfVersion() async {
+    try {
+      // Find the path of the running script. This works for globally activated scripts.
+      final scriptUri = Platform.script;
+      if (scriptUri.scheme != 'file') {
+        // This logic might fail for AOT snapshots if not file-based.
+        stderr.writeln(
+          'Cannot determine package version from a non-file script.',
+        );
+        return null;
+      }
+      final scriptPath = scriptUri.toFilePath();
+
+      // Walk up from the script path ('.../bin/verman.dart') to find the package root.
+      var currentDir = Directory(p.dirname(scriptPath));
+      while (currentDir.parent.path != currentDir.path) {
+        // Stop at root
+        final pubspecFile = File(p.join(currentDir.path, 'pubspec.yaml'));
+        if (await pubspecFile.exists()) {
+          final content = await pubspecFile.readAsString();
+          final doc = loadYaml(content);
+          if (doc['name'] == 'verman') {
+            final versionString = doc['version'] as String?;
+            if (versionString != null) {
+              final parts = versionString.split('+');
+              return {
+                'versionName': parts.first,
+                'buildNumber': parts.length > 1 ? parts.last : null,
+              };
+            }
+          }
+        }
+        currentDir = currentDir.parent;
+      }
+      return null; // pubspec.yaml not found
+    } catch (e) {
+      stderr.writeln('Error reading package version: $e');
+      return null;
+    }
   }
 }

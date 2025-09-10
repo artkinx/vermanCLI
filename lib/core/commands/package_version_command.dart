@@ -7,7 +7,13 @@ class PackageVersionCommand extends BaseCommand {
 
   @override
   Future<void> run() async {
-    final packageInfo = await FileService.getPackageInfo();
-    print('Verman: ${packageInfo.version}+${packageInfo.buildNumber}');
+    final versionInfo = await FileService.getSelfVersion();
+    if (versionInfo != null) {
+      final version = versionInfo['versionName'];
+      final build = versionInfo['buildNumber'];
+      print('verman version $version${build != null ? '+$build' : ''}');
+    } else {
+      print('Could not determine verman version.');
+    }
   }
 }

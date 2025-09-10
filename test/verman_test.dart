@@ -166,6 +166,19 @@ flutter {
           expect(updatedContent, contains('version: 1.2.4+5'));
         },
       );
+
+      test('`version` command should display the package version', () async {
+        final output = <String>[];
+        runZoned(
+          () => verman.main(['version']),
+          zoneSpecification: ZoneSpecification(
+            print: (self, parent, zone, line) {
+              output.add(line);
+            },
+          ),
+        );
+        expect(output, contains('verman version 1.1.1+3'));
+      });
     });
 
     group('init', () {

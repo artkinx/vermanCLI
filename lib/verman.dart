@@ -72,7 +72,7 @@ Future<void> main(List<String> arguments) async {
       break;
 
     case 'version':
-      PackageVersionCommand(args).run();
+      await PackageVersionCommand(args).run();
       break;
       
     case 'sync':

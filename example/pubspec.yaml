@@ -15,7 +15,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   verman: 
-    # path: ../../verman
+    path: ../../verman
 
 
 flutter:
