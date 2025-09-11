@@ -111,7 +111,7 @@ A big thank you to all the contributors who have helped make this project better
 
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/artkinx"><img src="https://avatars.githubusercontent.com/u/1034593?v=4" width="100px;" alt=""/><br /><sub><b>Akinwande Adunbi</b></sub></a></td>
+    <td align="center"><a href="https://github.com/artkinx"><img src="https://avatars.githubusercontent.com/u/69529643?s=400&u=4b3478913386ab2e0a9d4cf8e843a9eb27a66b02&v=4" width="100px;" alt=""/><br /><sub><b>Akinwande Adunbi</b></sub></a></td>
   </tr>
 </table>
 
