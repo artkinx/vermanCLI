@@ -56,11 +56,8 @@ Forgetting a step leads to inconsistencies. `Verman` solves this.
 Activate `verman` globally from your terminal.
 
 ```sh
-# From pub.dev (once published)
+# From pub.dev
 dart pub global activate verman
-
-# Or, activate from your local source code
-dart pub global activate --source path .
 ```
 
 ## Usage
@@ -112,7 +109,7 @@ iOS (ios/Runner/Info.plist) - ✅ Already configured to use Flutter variables.
 A big thank you to all the contributors who have helped make this project better!
 
 <!-- Add contributors here, for example: -->
--   **artkinx** - Idea, initial work, and feature development.
+-  [![artkinx](https://img.shields.io/badge/github-artkinx-333?logo=github)](https://github.com/artkinx) **artkinx** - Idea, initial work, and feature development.
 
 ## License
 
