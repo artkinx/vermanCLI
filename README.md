@@ -108,8 +108,12 @@ iOS (ios/Runner/Info.plist) - ✅ Already configured to use Flutter variables.
 
 A big thank you to all the contributors who have helped make this project better!
 
-<!-- Add contributors here, for example: -->
--  [![artkinx](https://img.shields.io/badge/github-artkinx-333?logo=github)](https://github.com/artkinx) **artkinx** - Idea, initial work, and feature development.
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/artkinx"><img src="https://avatars.githubusercontent.com/u/1034593?v=4" width="100px;" alt=""/><br /><sub><b>Akinwande Adunbi</b></sub></a></td>
+  </tr>
+</table>
 
 ## License
 
