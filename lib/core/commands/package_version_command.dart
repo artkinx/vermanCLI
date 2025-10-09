@@ -5,6 +5,7 @@ import 'base_command.dart';
 class PackageVersionCommand extends BaseCommand {
   PackageVersionCommand(super.args);
 
+  /// runs the operation to retrieve the verman tool's currently installed version
   @override
   Future<void> run() async {
     final versionInfo = await FileService.getSelfVersion();

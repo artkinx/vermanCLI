@@ -7,6 +7,8 @@ import 'base_command.dart';
 class BuildCommand extends BaseCommand {
   BuildCommand(super.args);
 
+
+  /// Bumps up the current build number by one
   @override
   Future<void> run() async {
     final content = await BaseCommand.getPubspecContent;

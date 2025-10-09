@@ -30,6 +30,27 @@ class FileService {
 
   /// Reads and returns the content of the pubspec.yaml file.
   /// @returns {PubspecContentModel?} The file content, or null if not found.
+  static PubspecContentModel? getFileContent(String filePath) {
+    final file = File(filePath);
+
+    if (!file.existsSync()) {
+      stderr.writeln('Error: $filePath not found in the current directory.');
+      return null;
+    }
+
+    try {
+      return PubspecContentModel(
+        path: filePath,
+        content: file.readAsStringSync(),
+      );
+    } on FileSystemException catch (e) {
+      stderr.writeln('Error reading $filePath: ${e.message}');
+      return null;
+    }
+  }
+
+  /// Reads and returns the content of the pubspec.yaml file.
+  /// @returns {PubspecContentModel?} The file content, or null if not found.
   static Future<PubspecContentModel?> getPubspecContentAsync() async {
     final pubspecFilePath = p.join(Directory.current.path, 'pubspec.yaml');
     final pubspecFile = File(pubspecFilePath);
@@ -46,6 +67,20 @@ class FileService {
       stderr.writeln('Error reading pubspec.yaml: ${e.message}');
       return null;
     }
+  }
+
+  /// Read custom config file
+  /// @returns YamlDocument
+  static YamlDocument? readCustomConfig(String path) {
+    final configFile = File(path);
+
+    if (configFile.existsSync()) {
+      var content = loadYamlDocument(configFile.readAsStringSync());
+
+      return content;
+    }
+
+    return null;
   }
 
   ///Write a new content to the pubspec.yaml file
@@ -71,13 +106,13 @@ class FileService {
   /// Reads and returns the version from the Android build.gradle file.
   /// @returns {Map&lt;String, String?&gt;?} A map with 'versionName' and 'buildNumber',
   /// or null if the file is not found/readable, or an empty map if parsing fails.
-  static Map<String, String?>? getAndroidVersion() {
-    var gradleFilePath = p.join(
-      Directory.current.path,
-      'android',
-      'app',
-      'build.gradle',
-    );
+  static Map<String, String?>? getAndroidVersion(String gradleFilePath) {
+    // var gradleFilePath = p.join(
+    //   Directory.current.path,
+    //   'android',
+    //   'app',
+    //   'build.gradle',
+    // );
     var gradleFile = File(gradleFilePath);
 
     if (!gradleFile.existsSync()) {
@@ -134,13 +169,8 @@ class FileService {
   /// Reads and returns the version from the iOS Info.plist file.
   /// @returns {Map&lt;String, String?&gt;?} A map with 'versionName' and 'buildNumber',
   /// or null if the file is not found/readable, or an empty map if parsing fails.
-  static Map<String, String?>? getIosVersion() {
-    final plistFilePath = p.join(
-      Directory.current.path,
-      'ios',
-      'Runner',
-      'Info.plist',
-    );
+  static Map<String, String?>? getIosVersion(String plistFilePath) {
+   
     final plistFile = File(plistFilePath);
 
     if (!plistFile.existsSync()) {

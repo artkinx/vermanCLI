@@ -40,7 +40,9 @@ class SyncCommand extends BaseCommand {
     required String buildNumber,
   }) {
     // Check and sync Android
-    final androidVersion = CommandService.getAndroidVersion();
+    final androidVersion = CommandService.getAndroidVersion(
+      config.androidGradlePath,
+    );
     if (androidVersion != null &&
         androidVersion['versionName'] == 'flutter.versionName') {
       print(
@@ -60,7 +62,7 @@ class SyncCommand extends BaseCommand {
 
   void _syncIos({required String versionName, required String buildNumber}) {
     // Check and sync iOS
-    final iosVersion = CommandService.getIosVersion();
+    final iosVersion = CommandService.getIosVersion(config.iosInfoPlistPath);
     if (iosVersion != null &&
         iosVersion['versionName'] == r'$(FLUTTER_BUILD_NAME)') {
       print(

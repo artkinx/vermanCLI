@@ -6,6 +6,8 @@ import 'base_command.dart';
 class CheckPlatformCommand extends BaseCommand {
   CheckPlatformCommand(super.args);
 
+  /// check to confirm if the ios and android platforms are correctly setup
+  /// to either reference the version info from the flutter object or manually set
   @override
   Future<void> run() async {
     final content = await BaseCommand.getPubspecContent;
@@ -26,7 +28,9 @@ class CheckPlatformCommand extends BaseCommand {
     var allInSync = true;
 
     // Check Android
-    final androidVersion = CommandService.getAndroidVersion();
+    final androidVersion = CommandService.getAndroidVersion(
+      config.androidGradlePath,
+    );
     if (androidVersion == null) {
       print(
         'Android (android/app/build.gradle) - ⚠️ Not found or could not read.',
@@ -56,19 +60,21 @@ class CheckPlatformCommand extends BaseCommand {
       }
 
       // Check iOS
-      final iosVersion = CommandService.getIosVersion();
+      final iosVersion = CommandService.getIosVersion(config.iosInfoPlistPath);
       if (iosVersion == null) {
-        print('iOS (ios/Runner/Info.plist) - ⚠️ Not found or could not read.');
+        print(
+          'iOS (${config.iosInfoPlistPath}) - ⚠️ Not found or could not read.',
+        );
         allInSync = false;
       } else if (iosVersion.isEmpty) {
-        print('iOS (ios/Runner/Info.plist) - ⚠️ Could not parse version.');
+        print('iOS (${config.iosInfoPlistPath}) - ⚠️ Could not parse version.');
         allInSync = false;
       } else {
         final isVariable =
             iosVersion['versionName'] == r'$(FLUTTER_BUILD_NAME)';
         if (isVariable) {
           print(
-            'iOS (ios/Runner/Info.plist) - ✅ In Sync (using Flutter variables)',
+            'iOS (${config.iosInfoPlistPath}) - ✅ In Sync (using Flutter variables)',
           );
         } else {
           final isNameMatch =

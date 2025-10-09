@@ -18,6 +18,11 @@ class CommandService {
           Note: This only works for hardcoded versions, not Flutter variables like `\$(FLUTTER_BUILD_NAME)`.
         ''';
 
+  static const String logHelp = '''
+          Updates your change log file based on your git commits.
+          Usage: dart run verman log
+        ''';
+
   static const String incrementHelp = '''
           Increments the version by major, minor, or patch.
           Usage: dart run verman increment [part]
@@ -59,7 +64,8 @@ Available commands for Flutter projects:
                           Example: increment patch
   build                 - Simulates running 'flutter pub run build_runner build' and increments the build number.
   sync                  - Syncs the pubspec.yaml version to platform-specific files.
-  check-platforms       - Verifies that platform-specific files reference the correct version.
+  check                 - Verifies that platform-specific files reference the correct version.
+  version               - Checks the currently installed version of the verman tool.
     ''';
 
   /// Updates the version in the pubspec.yaml file.
@@ -94,12 +100,12 @@ Available commands for Flutter projects:
     return null;
   }
 
-  static Map<String, String?>? getAndroidVersion() {
-    return FileService.getAndroidVersion();
+  static Map<String, String?>? getAndroidVersion(String gradleFilePath) {
+    return FileService.getAndroidVersion(gradleFilePath);
   }
 
-  static Map<String, String?>? getIosVersion() {
-    return FileService.getIosVersion();
+  static Map<String, String?>? getIosVersion(String plistFilePath) {
+    return FileService.getIosVersion(plistFilePath);
   }
 
   static bool updateAndroidVersion(String versionName, String buildNumber) {

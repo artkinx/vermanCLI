@@ -260,7 +260,7 @@ flutter {
       File(p.join(tempDir.path, iosPath)).writeAsStringSync(infoPlistContent);
     }
 
-    group('check-platforms', () {
+    group('check', () {
       test('reports out-of-sync for hardcoded mismatching versions', () async {
         _createMockPlatformFiles(
           buildGradleContent: initialBuildGradleContent, // 1.0+1
@@ -269,7 +269,7 @@ flutter {
 
         final result = await Process.run(Platform.executable, [
           scriptPath,
-          'check-platforms',
+          'check',
         ], workingDirectory: tempDir.path);
 
         expect(result.exitCode, 0);

@@ -7,6 +7,8 @@ import 'base_command.dart';
 class IncrementCommand extends BaseCommand {
   IncrementCommand(super.args);
 
+  /// Increases the build version values
+  /// [major] or [minor] or [patch] are the accepted options
   @override
   Future<void> run() async {
     if (args.isEmpty) {

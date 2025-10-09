@@ -6,9 +6,20 @@ import 'base_command.dart';
 class InitCommand extends BaseCommand {
   InitCommand(super.args);
 
+  /// Initializes the project by setting up the config file for the verman conftrol
+  /// writes into a new file [verman.yaml] by default
   @override
   Future<void> run() async {
-    final configFile = File(p.join(Directory.current.path, 'verman.yaml'));
+
+
+    File? configFile;
+
+    if (config.configFilePath.isNotEmpty) {
+      configFile = File(config.configFilePath);
+    } else {
+      configFile = File(p.join(Directory.current.path, 'verman.yaml'));
+    }
+
     if (!configFile.existsSync()) {
       // Default configuration
       const defaultConfig = '''
@@ -21,11 +32,18 @@ class InitCommand extends BaseCommand {
 # If a path is not provided, Verman will search for default files
 # (e.g., `android/app/build.gradle` or `android/app/build.gradle.kts`).
 #
-# paths:
+# verman:
 #   android: path/to/your/build.gradle
 #   ios: path/to/your/Info.plist
 ''';
-      configFile.writeAsStringSync(defaultConfig);
+      try {
+        configFile.writeAsStringSync(
+          config.configFilePath.isEmpty ? defaultConfig : config.configFilePath,
+        );
+      } catch (e) {
+        print('An error occurred while creating your config file.');
+        exit(1);
+      }
       print('✅ Created verman.yaml with default configuration.');
     } else {
       print('verman.yaml already exists.');

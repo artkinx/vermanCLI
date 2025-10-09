@@ -5,6 +5,7 @@ import '../services/command_service.dart';
 class CurrentCommand extends BaseCommand {
   CurrentCommand(super.args);
 
+  /// Gets the current build version values
   @override
   Future<void> run() async {
     final content = await BaseCommand.getPubspecContent;
