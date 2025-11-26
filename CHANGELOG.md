@@ -1,6 +1,9 @@
 
 # Changelog
 
+## 🦾 Latest - v2.0.0+6
+- **feat**: Add `generate` command to generate files based on the version.
+
 ## 🛠️ Upcoming - v1.2.0
 - 🪄 Changelog automation feature (auto-generates release from commit history)
 - 🔧 Configuration file for customizing automation behavior
