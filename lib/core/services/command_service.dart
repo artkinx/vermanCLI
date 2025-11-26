@@ -20,7 +20,7 @@ class CommandService {
 
   static const String logHelp = '''
           Updates your change log file based on your git commits.
-          Usage: dart run verman log
+          Usage: dart run verman generate log
         ''';
 
   static const String incrementHelp = '''
@@ -56,6 +56,15 @@ class CommandService {
           iOS (ios/Runner/Info.plist) version: 1.0.0 (1) - ✅ In Sync
         ''';
 
+  static const String generateHelp = '''
+          A general command that covers the generation of files.
+          Usage: dart run verman generate [command]
+
+          log: Generates a changelog based on git commits.
+          Example: dart run verman generate log
+
+        ''';
+
   static const String helpHelp = '''
 Available commands for Flutter projects:
   init                  - Initialize verman in the current project (optional).
@@ -66,6 +75,9 @@ Available commands for Flutter projects:
   sync                  - Syncs the pubspec.yaml version to platform-specific files.
   check                 - Verifies that platform-specific files reference the correct version.
   version               - Checks the currently installed version of the verman tool.
+  generate [options]    - A general command that covers the generation of files.
+                          Example: dart run verman generate log
+  help                  - Displays help information for a specific command. 
     ''';
 
   /// Updates the version in the pubspec.yaml file.
@@ -100,18 +112,32 @@ Available commands for Flutter projects:
     return null;
   }
 
+  /// Gets the version name and build number from the Android gradle file.
+  /// @param {String} gradleFilePath The path to the Android gradle file.
+  /// @returns {{versionName: String, buildNumber: String?}} The version data, or null if not found.
   static Map<String, String?>? getAndroidVersion(String gradleFilePath) {
     return FileService.getAndroidVersion(gradleFilePath);
   }
 
+  /// Gets the version name and build number from the iOS plist file.
+  /// @param {String} plistFilePath The path to the iOS plist file.
+  /// @returns {{versionName: String, buildNumber: String?}} The version data, or null if not found.
   static Map<String, String?>? getIosVersion(String plistFilePath) {
     return FileService.getIosVersion(plistFilePath);
   }
 
+  /// Updates the version in the Android gradle file.
+  /// @param {String} versionName The new version name (e.g., "1.0.1").
+  /// @param {String} buildNumber The new build number (e.g., "1").
+  /// @returns {bool} True if the update was successful, false otherwise.
   static bool updateAndroidVersion(String versionName, String buildNumber) {
     return FileService.updateAndroidVersion(versionName, buildNumber);
   }
 
+  /// Updates the version in the iOS plist file.
+  /// @param {String} versionName The new version name (e.g., "1.0.1").
+  /// @param {String} buildNumber The new build number (e.g., "1").
+  /// @returns {bool} True if the update was successful, false otherwise.
   static bool updateIosVersion(String versionName, String buildNumber) {
     return FileService.updateIosVersion(versionName, buildNumber);
   }

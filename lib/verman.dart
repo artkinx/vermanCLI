@@ -2,9 +2,10 @@ import 'dart:io';
 // ignore: unused_import
 import 'package:path/path.dart' as p;
 import 'package:verman/core/commands/build_command.dart';
-import 'package:verman/core/commands/changelog_command.dart';
+import 'package:verman/core/commands/generate/changelog_command.dart';
 import 'package:verman/core/commands/check_platform_command.dart';
 import 'package:verman/core/commands/current_command.dart';
+import 'package:verman/core/commands/generate/generate_command.dart';
 import 'package:verman/core/commands/increment_command.dart';
 import 'package:verman/core/commands/init_command.dart';
 import 'package:verman/core/commands/package_version_command.dart';
@@ -76,8 +77,12 @@ void main(List<String> arguments) {
       print(CommandService.syncHelp);
     }
 
-    if (arguments.first == 'log') {
-      print(CommandService.logHelp);
+    if (arguments.first == 'generate') {
+      if (arguments[1] == 'log') {
+        print(CommandService.logHelp);
+      } else {
+        print(CommandService.generateHelp);
+      }
     }
 
     return;
@@ -108,8 +113,8 @@ void main(List<String> arguments) {
     case 'build':
       BuildCommand(args).run();
       break;
-    case 'log':
-      ChangelogCommand(args).run();
+    case 'generate':
+      GenerateCommand(args).run();
       break;
     default:
       stderr.writeln(

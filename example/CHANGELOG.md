@@ -1,26 +1,54 @@
-## Unreleased
-- docs: update contributor's avatar URL in README
-- docs: improve contributors section formatting in README
-- docs: update README.md with simplified activation and contributor badge
-- chore: bump version to 1.1.3+5
-- chore: bump version to 1.1.3+5
-- chore: bump version to 1.1.3+4
-- chore: revert version to 1.1.2+4 in pubspec files
-- chore: update package version in pubspec.lock
-- feat: refactor command service and improve version syncing
-- Update issue templates
-- fix(version): replace package_info_plus with custom version detection
-- feat(version): add package version command and update dependencies
-- docs: update changelog with latest changes
-- refactor(command_service): remove unused imports
-- docs(command_service): add init command to help text
-- feat: add init command and support custom paths in verman.yaml
-- chore: bump version to 1.1.0+2
-- docs: update changelog for platform support fix
-- build: update verman dependency from local path to pub.dev version
-- build: add ios and android platforms to pubspec.yaml
-- chore: bump version to 1.1.0+1
-- docs: update repository URLs and enhance example README
-- docs: add MIT license file
-- first build
+## 1.0.1+11  28aa417
+  ### feat(config)
+    - feat(config): add support for custom config paths and improve version syncing
+  ### docs
+    - docs: update contributor's avatar URL in README
+    - docs: improve contributors section formatting in README
+    - docs: update README.md with simplified activation and contributor badge
+  ### chore
+    - chore: bump version to 1.1.3+5
+    - chore: bump version to 1.1.3+5
+    - chore: bump version to 1.1.3+4
+    - chore: revert version to 1.1.2+4 in pubspec files
+    - chore: update package version in pubspec.lock
+  ### feat
+    - feat: refactor command service and improve version syncing
+
+## 1.0.1+11  ea97800
+  ### feat(config)
+    - feat(config): add support for custom config paths and improve version syncing
+  ### docs
+    - docs: update contributor's avatar URL in README
+    - docs: improve contributors section formatting in README
+    - docs: update README.md with simplified activation and contributor badge
+    - docs: update changelog with latest changes
+    - docs: update changelog for platform support fix
+    - docs: update repository URLs and enhance example README
+    - docs: add MIT license file
+  ### chore
+    - chore: bump version to 1.1.3+5
+    - chore: bump version to 1.1.3+5
+    - chore: bump version to 1.1.3+4
+    - chore: revert version to 1.1.2+4 in pubspec files
+    - chore: update package version in pubspec.lock
+    - chore: bump version to 1.1.0+2
+    - chore: bump version to 1.1.0+1
+  ### feat
+    - feat: refactor command service and improve version syncing
+    - feat: add init command and support custom paths in verman.yaml
+  ### Update issue templates;ea97800
+    - Update issue templates
+  ### fix(version)
+    - fix(version): replace package_info_plus with custom version detection
+  ### feat(version)
+    - feat(version): add package version command and update dependencies
+  ### refactor(command_service)
+    - refactor(command_service): remove unused imports
+  ### docs(command_service)
+    - docs(command_service): add init command to help text
+  ### build
+    - build: update verman dependency from local path to pub.dev version
+    - build: add ios and android platforms to pubspec.yaml
+  ### first build;5a63850
+    - first build
 
